@@ -15,7 +15,5 @@ int main()
 	string author, title;
 	double cost;
 
-
-	dfsdf
 	return 0;
 }
