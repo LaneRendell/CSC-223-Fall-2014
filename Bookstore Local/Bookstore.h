@@ -2,6 +2,7 @@
 #define BOOKSTORE_H
 
 #include <iostream>
+#include "Book.h"
 using namespace std;
 
 const int CAPACITY = 30;
@@ -28,10 +29,11 @@ public:
 
 	ostream& operator <<(Bookstore store);
 
+	~Bookstore();
+
 private:
 	int count;
 	Book list[CAPACITY];
-
 	void sort();
 };
 
