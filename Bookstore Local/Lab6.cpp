@@ -157,7 +157,6 @@ void MenuCall(string operationCall, Bookstore store)
 	ifstream in_stream;
 
 	token = operationCall.substr(0, operationCall.find(delimter));
-	cout << token << endl;
 	// Erase the line up to the token
 	operationCall.erase(0, operationCall.find(delimter) + delimter.length());
 
@@ -211,11 +210,6 @@ void MenuCall(string operationCall, Bookstore store)
 			author = TrimWhiteSpace(author);
 			price = TrimWhiteSpace(price);
 
-			cout << "ISBN: " << isbn << endl;
-			cout << "Title: " << title << endl;
-			cout << "Author: " << author << endl;
-			cout << "Price: " << price << endl;
-
 			// cast variables
 			iISBN = stoi(isbn);
 			dPrice = stod(price);
@@ -225,6 +219,15 @@ void MenuCall(string operationCall, Bookstore store)
 			book.setAuthor(author);
 			book.setTitle(title);
 			book.setCost(dPrice);
+
+			// testing stuff
+			cout << book.getISBN() << endl;
+			cout << book.getAuthor() << endl;
+			cout << book.getTitle() << endl;
+			cout << book.getCost() << endl;
+
+			// Load into bookstore 
+			store.addBook(book);
 		}
 
 
