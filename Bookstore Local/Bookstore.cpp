@@ -10,5 +10,4 @@ Bookstore::Bookstore()
 
 Bookstore::~Bookstore()
 {
-	cout << "Object is being destroyed.";
 }

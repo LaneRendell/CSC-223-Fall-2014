@@ -151,6 +151,7 @@ void MenuCall(string operationCall, Bookstore store)
 	int iISBN, count = 0;
 	double dPrice;
 	int size = 0;
+	Book book;
 
 	// Declare an istream variable to open the file
 	ifstream in_stream;
@@ -185,10 +186,10 @@ void MenuCall(string operationCall, Bookstore store)
 					isbn = token;
 				}
 				else if (count == 1) {
-					title = token;
+					author = token;
 				}
 				else if (count == 2) {
-					author = token;
+					title = token;
 				}
 				count++;
 			}
@@ -201,17 +202,31 @@ void MenuCall(string operationCall, Bookstore store)
 			// reset counter
 			count = 0;
 
-			
-
 			// grab leftover stuff which won't be seperated by delimeter
+			price = inputLine;
+
+			// Trim whitespace in strings
+			isbn = TrimWhiteSpace(isbn);
+			title = TrimWhiteSpace(title);
+			author = TrimWhiteSpace(author);
+			price = TrimWhiteSpace(price);
+
 			cout << "ISBN: " << isbn << endl;
 			cout << "Title: " << title << endl;
 			cout << "Author: " << author << endl;
-			price = inputLine;
-
 			cout << "Price: " << price << endl;
 
+			// cast variables
+			iISBN = stoi(isbn);
+			dPrice = stod(price);
+
+			// Create book
+			book.setISBN(iISBN);
+			book.setAuthor(author);
+			book.setTitle(title);
+			book.setCost(dPrice);
 		}
+
 
 		in_stream.close(); // close the input file
 		break;
@@ -249,7 +264,7 @@ void MenuCall(int choice, Bookstore bookstore, ofstream &out_file)
 string TrimWhiteSpace(string &inString)
 {
 	// Find first nonwhitespace character
-	int strBegin, strEnd;
+	int strBegin, strEnd, strRange;
 	string whitespace = " \t";
 
 	// Check if for some reason we got a string that doesnt need pruned
@@ -260,6 +275,7 @@ string TrimWhiteSpace(string &inString)
 
 	strBegin = inString.find_first_not_of(whitespace);
 	strEnd = inString.find_last_not_of(whitespace);
+	strRange = strEnd - strBegin + 1;
 
-	return inString.substr(strBegin, strEnd);
+	return inString.substr(strBegin, strRange);
 }

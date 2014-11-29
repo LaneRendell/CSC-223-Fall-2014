@@ -8,6 +8,7 @@ using namespace std;
 class Book {
 
 public:
+
 	void setISBN(int ISBN);
 	void setAuthor(string author);
 	void setTitle(string title);
