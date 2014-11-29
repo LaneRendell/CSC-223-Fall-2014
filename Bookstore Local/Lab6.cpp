@@ -58,6 +58,14 @@ void MenuCall(string operationCall, Bookstore bookstore);
 //*****************************************************************************
 void MenuCall(int choice, Bookstore bookstore, ofstream &out);
 
+//*****************************************************************************
+// Method Function: Trims leading whitespace in string.
+// Precondition: None (valid string).
+// Postcondition: Leading & trailining whitespace is thrown into the abyss and
+//				  forgotten  returns new string.
+//*****************************************************************************
+string TrimWhiteSpace(string &inString);
+
 int main()
 {
 	Bookstore store;
@@ -140,7 +148,7 @@ void MenuCall(string operationCall, Bookstore store)
 	// cast it to an integer
 	string delimter = ",", token;
 	string inputLine, isbn, author, title, price;
-	int iISBN;
+	int iISBN, count = 0;
 	double dPrice;
 	int size = 0;
 
@@ -164,11 +172,45 @@ void MenuCall(string operationCall, Bookstore store)
 		{
 			getline(in_stream, inputLine);
 			delimter = ",";
+
+			// We need to count how many iterations we are doing
+			// to assign the string to the correct variable
+
 			while ((size = inputLine.find_first_of(delimter)) != string::npos) {
 				token = inputLine.substr(0, size);
-				std::cout << token << std::endl;
 				inputLine.erase(0, size + delimter.length());
+
+				if (count == 0)
+				{
+					isbn = token;
+				}
+				else if (count == 1) {
+					title = token;
+				}
+				else if (count == 2) {
+					author = token;
+				}
+				count++;
 			}
+
+			// If count == 3 then we have invalid input
+			if (count != 3) {
+				cout << "Invalid input line ignoring." << endl;
+				break;
+			}
+			// reset counter
+			count = 0;
+
+			
+
+			// grab leftover stuff which won't be seperated by delimeter
+			cout << "ISBN: " << isbn << endl;
+			cout << "Title: " << title << endl;
+			cout << "Author: " << author << endl;
+			price = inputLine;
+
+			cout << "Price: " << price << endl;
+
 		}
 
 		in_stream.close(); // close the input file
@@ -202,4 +244,22 @@ void MenuCall(int choice, Bookstore bookstore, ofstream &out_file)
 		cout << "Invalid menu choice." << endl;
 		break;
 	}
+}
+
+string TrimWhiteSpace(string &inString)
+{
+	// Find first nonwhitespace character
+	int strBegin, strEnd;
+	string whitespace = " \t";
+
+	// Check if for some reason we got a string that doesnt need pruned
+	if (inString.find_first_not_of(whitespace) == string::npos)
+	{
+		return inString;
+	}
+
+	strBegin = inString.find_first_not_of(whitespace);
+	strEnd = inString.find_last_not_of(whitespace);
+
+	return inString.substr(strBegin, strEnd);
 }
