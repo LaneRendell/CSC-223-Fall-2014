@@ -66,7 +66,14 @@ void MenuCall(int choice, Bookstore &bookstore, ofstream &out);
 //*****************************************************************************
 string TrimWhiteSpace(string &inString);
 
-void createBookstore(string inString, Bookstore store, ostream &out);
+void createBookstore(string inString, Bookstore &store, ostream &out);
+
+//*****************************************************************************
+// Method Function: Takes a line of input and attempts to make a book.
+// Precondition: Nonempty string
+// Postcondition: Returns a book object.
+///****************************************************************************
+Book parseBookInput(string inputBook);
 
 int main()
 {
@@ -80,11 +87,13 @@ int main()
 	out << "---------------------\n";
 	out << endl;
 	MenuCall("1, bookInput.txt", store, out);
-
+	store.printBookStore(out);
 	out << "add a book\n";
 	out << "------------\n";
 	out << endl;
+	store.printBookStore(out);
 	MenuCall("2, 667788,	Intro to Java, Daniel Ling, 150", store, out);
+	store.printBookStore(out);
 	MenuCall("4, 667788", store, out);
 
 	out << "Delete a book\n";
@@ -146,6 +155,7 @@ void MenuCall(string operationCall, Bookstore &store, ostream &out)
 	// We need to get the choice which will be the first character,
 	// cast it to an integer
 	string delimter = ",", token;
+	Book book;
 
 	token = operationCall.substr(0, operationCall.find(delimter));
 	// Erase the line up to the token
@@ -155,9 +165,12 @@ void MenuCall(string operationCall, Bookstore &store, ostream &out)
 
 	case 1:				// Create a bookstore
 		createBookstore(operationCall, store, out);
-		
 		break;
 	case 2:
+		//store.printBookStore(out);
+		book = parseBookInput(operationCall);
+		store.addBook(book);
+		//store.printBookStore(out);
 		break;
 	case 3:
 		break;
@@ -207,78 +220,80 @@ string TrimWhiteSpace(string &inString)
 	return inString.substr(strBegin, strRange);
 }
 
-void createBookstore(string inString, Bookstore store, ostream &out)
+void createBookstore(string inString, Bookstore &store, ostream &out)
 {
-	string inputLine, isbn, author, title, price, delimeter, token;
-	int iISBN, count = 0;
-	double dPrice;
-	int size = 0;
+	string inputLine;
 	Book book;
-
+	inString = TrimWhiteSpace(inString);
 	// Declare an istream variable to open the file
 	ifstream in_stream;
-	in_stream.open("bookInput.txt");
+
+	in_stream.open(inString);
 	OpenFile(in_stream);
 
 	// While the file is open parse it line by line
 	while (!in_stream.eof())
 	{
 		getline(in_stream, inputLine);
-		delimeter = ",";
-
-		// We need to count how many iterations we are doing
-		// to assign the string to the correct variable
-
-		while ((size = inputLine.find_first_of(delimeter)) != string::npos) {
-			token = inputLine.substr(0, size);
-			inputLine.erase(0, size + delimeter.length());
-
-			if (count == 0)
-			{
-				isbn = token;
-			}
-			else if (count == 1) {
-				author = token;
-			}
-			else if (count == 2) {
-				title = token;
-			}
-			count++;
-		}
-
-		// If count == 3 then we have invalid input
-		if (count != 3) {
-			cout << "Invalid input line ignoring." << endl;
-			break;
-		}
-		// reset counter
-		count = 0;
-
-		// grab leftover stuff which won't be seperated by delimeter
-		price = inputLine;
-
-		// Trim whitespace in strings
-		isbn = TrimWhiteSpace(isbn);
-		title = TrimWhiteSpace(title);
-		author = TrimWhiteSpace(author);
-		price = TrimWhiteSpace(price);
-
-		// cast variables
-		iISBN = stoi(isbn);
-		dPrice = stod(price);
-
-		// Create book
-		book.setISBN(iISBN);
-		book.setAuthor(author);
-		book.setTitle(title);
-		book.setCost(dPrice);
+		book = parseBookInput(inputLine);
 
 		// Load into bookstore 
 		store.addBook(book);
 	}
 
 	// Confirmation that we added the books into the database
-	store.printBookStore(out);
+	//store.printBookStore(out);
 
 	in_stream.close(); // close the input file
+}
+
+Book parseBookInput(string inputBook)
+{
+	Book book;
+	int iISBN, count = 0, size = 0;
+	double dPrice;
+	string delimeter, token, isbn, author, title, price;
+	delimeter = ",";
+
+	// We need to count how many iterations we are doing
+	// to assign the string to the correct variable
+	while ((size = inputBook.find_first_of(delimeter)) != string::npos) {
+		token = inputBook.substr(0, size);
+		inputBook.erase(0, size + delimeter.length());
+
+		if (count == 0)
+		{
+			isbn = token;
+		}
+		else if (count == 1) {
+			author = token;
+		}
+		else if (count == 2) {
+			title = token;
+		}
+		count++;
+	}
+
+	count = 0;
+
+	// grab leftover stuff which won't be seperated by delimeter
+	price = inputBook;
+
+	// Trim whitespace in strings
+	isbn = TrimWhiteSpace(isbn);
+	title = TrimWhiteSpace(title);
+	author = TrimWhiteSpace(author);
+	price = TrimWhiteSpace(price);
+
+	// cast variables
+	iISBN = stoi(isbn);
+	dPrice = stod(price);
+
+	// Create book
+	book.setISBN(iISBN);
+	book.setAuthor(author);
+	book.setTitle(title);
+	book.setCost(dPrice);
+
+	return book;
 }
