@@ -38,7 +38,7 @@ public:
 
 	double totalInvestment();
 
-	void printBookStore();
+	void printBookStore(ostream &out);
 
 	ostream& operator <<(Bookstore store);
 

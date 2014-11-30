@@ -29,6 +29,8 @@ bool Bookstore::addBook(Book aBook)
 
 		// increment count
 		Bookstore::count += 1;
+
+		return true;
 	}
 }
 
@@ -55,4 +57,16 @@ bool Bookstore::retrieveBook(Book& aBook)
 		}
 	}
 	return false;
+}
+
+void Bookstore::printBookStore(ostream &out)
+{
+	for (int i = 0; i < count; i++)
+	{
+		out << Bookstore::list[i].getISBN() << "\t";
+		out << Bookstore::list[i].getAuthor() << ", ";
+		out << Bookstore::list[i].getTitle() << ", \t";
+		out << Bookstore::list[i].getCost() << endl;
+	}
+	out << endl;
 }

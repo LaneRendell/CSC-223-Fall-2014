@@ -38,7 +38,7 @@ void OpenFile(ofstream &out_File);
 //			6 - Print the inventory in ascending order.
 //			7 - Quit
 //*****************************************************************************
-void MenuCall(string operationCall, Bookstore bookstore);
+void MenuCall(string operationCall, Bookstore &bookstore, ostream &out);
 
 //*****************************************************************************
 // Method Function: Takes first character of string and determines operation to
@@ -56,7 +56,7 @@ void MenuCall(string operationCall, Bookstore bookstore);
 //			6 - Print the inventory in ascending order.
 //			7 - Quit
 //*****************************************************************************
-void MenuCall(int choice, Bookstore bookstore, ofstream &out);
+void MenuCall(int choice, Bookstore &bookstore, ofstream &out);
 
 //*****************************************************************************
 // Method Function: Trims leading whitespace in string.
@@ -66,12 +66,11 @@ void MenuCall(int choice, Bookstore bookstore, ofstream &out);
 //*****************************************************************************
 string TrimWhiteSpace(string &inString);
 
+void createBookstore(string inString, Bookstore store, ostream &out);
+
 int main()
 {
 	Bookstore store;
-	int isbn;
-	string author, title;
-	double cost;
 	ofstream out;
 
 	OpenFile(out);
@@ -80,40 +79,40 @@ int main()
 	out << "Create the Database\n";
 	out << "---------------------\n";
 	out << endl;
-	MenuCall("1, bookInput.txt", store);
+	MenuCall("1, bookInput.txt", store, out);
 
 	out << "add a book\n";
 	out << "------------\n";
 	out << endl;
-	MenuCall("2, 667788,	Intro to Java, Daniel Ling, 150", store);
-	MenuCall("4, 667788", store);
+	MenuCall("2, 667788,	Intro to Java, Daniel Ling, 150", store, out);
+	MenuCall("4, 667788", store, out);
 
 	out << "Delete a book\n";
 	out << "---------------\n";
 	out << endl;
-	MenuCall("3, 23456", store);
+	MenuCall("3, 23456", store, out);
 
 	out << "Retrieve a book and print it.\n";
 	out << "---------------\n";
 	out << endl;
-	MenuCall("4, 23456", store);	// if the book is not in the database
+	MenuCall("4, 23456", store, out);	// if the book is not in the database
 									// give an appropriate message
 
 	out << "Retrieve a book and print it.\n";
 	out << "---------------\n";
 	out << endl;
-	MenuCall("4, 34567", store);
+	MenuCall("4, 34567", store, out);
 
 	out << "Update the store cost.\n";
 	out << "------------------------\n";
 	out << endl;
-	MenuCall("5, 45678, 250", store);
-	MenuCall("4, 45678", store);
+	MenuCall("5, 45678, 250", store, out);
+	MenuCall("4, 45678", store, out);
 
 	out << "Print the database in ascending order. \n";
 	out << "---------------------------------------\n";
 	out << endl;
-	MenuCall("6", store);
+	MenuCall("6", store,out);
 
 	out << "Quit\n";
 	out << "-------\n";
@@ -142,19 +141,11 @@ void OpenFile(ofstream &out)
 	}
 }
 
-void MenuCall(string operationCall, Bookstore store)
+void MenuCall(string operationCall, Bookstore &store, ostream &out)
 {
 	// We need to get the choice which will be the first character,
 	// cast it to an integer
 	string delimter = ",", token;
-	string inputLine, isbn, author, title, price;
-	int iISBN, count = 0;
-	double dPrice;
-	int size = 0;
-	Book book;
-
-	// Declare an istream variable to open the file
-	ifstream in_stream;
 
 	token = operationCall.substr(0, operationCall.find(delimter));
 	// Erase the line up to the token
@@ -163,75 +154,8 @@ void MenuCall(string operationCall, Bookstore store)
 	switch (stoi(token)) {
 
 	case 1:				// Create a bookstore
-		// We need to read in a file
-		in_stream.open("bookInput.txt");
-		OpenFile(in_stream);
-
-		// While the file is open parse it line by line
-		while (!in_stream.eof())
-		{
-			getline(in_stream, inputLine);
-			delimter = ",";
-
-			// We need to count how many iterations we are doing
-			// to assign the string to the correct variable
-
-			while ((size = inputLine.find_first_of(delimter)) != string::npos) {
-				token = inputLine.substr(0, size);
-				inputLine.erase(0, size + delimter.length());
-
-				if (count == 0)
-				{
-					isbn = token;
-				}
-				else if (count == 1) {
-					author = token;
-				}
-				else if (count == 2) {
-					title = token;
-				}
-				count++;
-			}
-
-			// If count == 3 then we have invalid input
-			if (count != 3) {
-				cout << "Invalid input line ignoring." << endl;
-				break;
-			}
-			// reset counter
-			count = 0;
-
-			// grab leftover stuff which won't be seperated by delimeter
-			price = inputLine;
-
-			// Trim whitespace in strings
-			isbn = TrimWhiteSpace(isbn);
-			title = TrimWhiteSpace(title);
-			author = TrimWhiteSpace(author);
-			price = TrimWhiteSpace(price);
-
-			// cast variables
-			iISBN = stoi(isbn);
-			dPrice = stod(price);
-
-			// Create book
-			book.setISBN(iISBN);
-			book.setAuthor(author);
-			book.setTitle(title);
-			book.setCost(dPrice);
-
-			// testing stuff
-			cout << book.getISBN() << endl;
-			cout << book.getAuthor() << endl;
-			cout << book.getTitle() << endl;
-			cout << book.getCost() << endl;
-
-			// Load into bookstore 
-			store.addBook(book);
-		}
-
-
-		in_stream.close(); // close the input file
+		createBookstore(operationCall, store, out);
+		
 		break;
 	case 2:
 		break;
@@ -247,7 +171,7 @@ void MenuCall(string operationCall, Bookstore store)
 	}
 }
 
-void MenuCall(int choice, Bookstore bookstore, ofstream &out_file)
+void MenuCall(int choice, Bookstore &bookstore, ofstream &out_file)
 {
 	switch (choice)
 	{
@@ -281,4 +205,80 @@ string TrimWhiteSpace(string &inString)
 	strRange = strEnd - strBegin + 1;
 
 	return inString.substr(strBegin, strRange);
+}
+
+void createBookstore(string inString, Bookstore store, ostream &out)
+{
+	string inputLine, isbn, author, title, price, delimeter, token;
+	int iISBN, count = 0;
+	double dPrice;
+	int size = 0;
+	Book book;
+
+	// Declare an istream variable to open the file
+	ifstream in_stream;
+	in_stream.open("bookInput.txt");
+	OpenFile(in_stream);
+
+	// While the file is open parse it line by line
+	while (!in_stream.eof())
+	{
+		getline(in_stream, inputLine);
+		delimeter = ",";
+
+		// We need to count how many iterations we are doing
+		// to assign the string to the correct variable
+
+		while ((size = inputLine.find_first_of(delimeter)) != string::npos) {
+			token = inputLine.substr(0, size);
+			inputLine.erase(0, size + delimeter.length());
+
+			if (count == 0)
+			{
+				isbn = token;
+			}
+			else if (count == 1) {
+				author = token;
+			}
+			else if (count == 2) {
+				title = token;
+			}
+			count++;
+		}
+
+		// If count == 3 then we have invalid input
+		if (count != 3) {
+			cout << "Invalid input line ignoring." << endl;
+			break;
+		}
+		// reset counter
+		count = 0;
+
+		// grab leftover stuff which won't be seperated by delimeter
+		price = inputLine;
+
+		// Trim whitespace in strings
+		isbn = TrimWhiteSpace(isbn);
+		title = TrimWhiteSpace(title);
+		author = TrimWhiteSpace(author);
+		price = TrimWhiteSpace(price);
+
+		// cast variables
+		iISBN = stoi(isbn);
+		dPrice = stod(price);
+
+		// Create book
+		book.setISBN(iISBN);
+		book.setAuthor(author);
+		book.setTitle(title);
+		book.setCost(dPrice);
+
+		// Load into bookstore 
+		store.addBook(book);
+	}
+
+	// Confirmation that we added the books into the database
+	store.printBookStore(out);
+
+	in_stream.close(); // close the input file
 }
