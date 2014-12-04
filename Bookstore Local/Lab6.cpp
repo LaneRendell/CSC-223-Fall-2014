@@ -211,6 +211,9 @@ void MenuCall(int choice, Bookstore &store, ofstream &out)
 	case 6:
 		out << store << endl;
 		store.totalInvestment();
+		out << "Total Investment\n";
+		out << "------------------\n";
+		out << "$" << fixed << setprecision(2) << store.totalInvestment() << endl;
 		break;
 	case 7:
 		// close Files

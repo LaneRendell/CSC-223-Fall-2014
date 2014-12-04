@@ -25,6 +25,9 @@ public:
 	bool addBook(Book aBook);
 
 	bool deleteBook(Book aBook);
+	// a function to delete a book from the list
+	//  if the array is empty, or the book is not in the array return false, else remove  
+	// the book from the list and return true
 
 
 	//*************************************************************************
@@ -37,10 +40,15 @@ public:
 	bool retrieveBook(Book& abook);
 
 	double totalInvestment();
+	// a function that returns the total cost that the bookStore invested in books
 
 	void printBookStore(ostream &out);
+	// For each book print the book ISBN number, book author, book title and cost
 
 	friend std::ostream& operator << (std::ostream& out, Bookstore& store);
+	// overload the << operator a function to print all the books in the bookStore in 
+	// ascending order by cost of  the book.  
+	// For each book print the book ISBN number, book author, book title and cost
 
 
 private:
