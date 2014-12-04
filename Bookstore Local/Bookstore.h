@@ -2,8 +2,8 @@
 #define BOOKSTORE_H
 
 #include <iostream>
+#include <ostream>
 #include "Book.h"
-using namespace std;
 
 const int CAPACITY = 30;
 
@@ -40,9 +40,8 @@ public:
 
 	void printBookStore(ostream &out);
 
-	ostream& operator <<(Bookstore store);
+	friend std::ostream& operator << (std::ostream& out, Bookstore& store);
 
-	~Bookstore();
 
 private:
 	int count;

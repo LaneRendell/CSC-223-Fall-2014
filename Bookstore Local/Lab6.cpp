@@ -83,17 +83,16 @@ int main()
 	OpenFile(out);
 	out.open("out.txt");
 
+
 	out << "Create the Database\n";
 	out << "---------------------\n";
 	out << endl;
 	MenuCall("1, bookInput.txt", store, out);
-	store.printBookStore(out);
 	out << "add a book\n";
 	out << "------------\n";
 	out << endl;
-	store.printBookStore(out);
 	MenuCall("2, 667788,	Intro to Java, Daniel Ling, 150", store, out);
-	store.printBookStore(out);
+	out << "Added book\n";
 	MenuCall("4, 667788", store, out);
 
 	out << "Delete a book\n";
@@ -121,13 +120,12 @@ int main()
 	out << "Print the database in ascending order. \n";
 	out << "---------------------------------------\n";
 	out << endl;
-	MenuCall("6", store,out);
+	MenuCall(6, store, out);
 
 	out << "Quit\n";
 	out << "-------\n";
 	out << endl;
 	MenuCall(7, store, out);
-
 
 	return 0;
 }
@@ -167,36 +165,58 @@ void MenuCall(string operationCall, Bookstore &store, ostream &out)
 		createBookstore(operationCall, store, out);
 		break;
 	case 2:
-		//store.printBookStore(out);
 		book = parseBookInput(operationCall);
 		store.addBook(book);
-		//store.printBookStore(out);
+		store.printBookStore(out);
 		break;
 	case 3:
+		book = parseBookInput(operationCall);
+		out << "Deleted Book\n";
+		out << "---------------" << endl;
+		out << book.getISBN() << endl;
+		out << "---------------" << endl;
+		store.deleteBook(book);
+		
+		store.printBookStore(out);
 		break;
 	case 4:
+		book = parseBookInput(operationCall);
+		if (store.retrieveBook(book) == true)
+		{
+			out << book.getISBN() << ", " << book.getAuthor()
+				<< ", " << book.getTitle() << ", \t" << book.getCost() << endl;
+		}
+		else {
+			out << "Error: Book not found in store." << endl;
+		}
+		
+		
 		break;
 	case 5:
+		book = parseBookInput(operationCall);
+		// Add book will update a book in the list
+		store.addBook(book);
+		store.printBookStore(out);
+
 		break;
 	default:
-		cout << "Invalid menu choice." << endl;
 		break;
 	}
 }
 
-void MenuCall(int choice, Bookstore &bookstore, ofstream &out_file)
+void MenuCall(int choice, Bookstore &store, ofstream &out)
 {
 	switch (choice)
 	{
 	case 6:
+		out << store << endl;
+		store.totalInvestment();
 		break;
 	case 7:
 		// close Files
-		out_file.close();
-		bookstore.~Bookstore();
-		break;
+		out.close();
+		exit(0); // exit program 
 	default:
-		cout << "Invalid menu choice." << endl;
 		break;
 	}
 }
@@ -242,7 +262,7 @@ void createBookstore(string inString, Bookstore &store, ostream &out)
 	}
 
 	// Confirmation that we added the books into the database
-	//store.printBookStore(out);
+	store.printBookStore(out);
 
 	in_stream.close(); // close the input file
 }
@@ -259,7 +279,6 @@ Book parseBookInput(string inputBook)
 	// to assign the string to the correct variable
 	while ((size = inputBook.find_first_of(delimeter)) != string::npos) {
 		token = inputBook.substr(0, size);
-		inputBook.erase(0, size + delimeter.length());
 
 		if (count == 0)
 		{
@@ -271,29 +290,45 @@ Book parseBookInput(string inputBook)
 		else if (count == 2) {
 			title = token;
 		}
+		inputBook.erase(0, size + delimeter.length());
 		count++;
 	}
 
+	// if delimeter isnt in string
+	if ((size = inputBook.find_first_of(delimeter)) == string::npos && count == 0)
+	{
+		token = inputBook.substr(0, size);
+		isbn = token;
+	}
+
+	if (count == 0)
+	{
+		isbn = TrimWhiteSpace(isbn);
+		iISBN = stoi(isbn);
+		book.setISBN(iISBN);
+	}
+	else {
+		// grab leftover stuff which won't be seperated by delimeter
+		price = inputBook;
+
+		// Trim whitespace in strings
+		isbn = TrimWhiteSpace(isbn);
+		title = TrimWhiteSpace(title);
+		author = TrimWhiteSpace(author);
+		price = TrimWhiteSpace(price);
+
+		// cast variables
+		iISBN = stoi(isbn);
+		dPrice = stod(price);
+
+		// Create book
+		book.setISBN(iISBN);
+		book.setAuthor(author);
+		book.setTitle(title);
+		book.setCost(dPrice);
+	}
+
 	count = 0;
-
-	// grab leftover stuff which won't be seperated by delimeter
-	price = inputBook;
-
-	// Trim whitespace in strings
-	isbn = TrimWhiteSpace(isbn);
-	title = TrimWhiteSpace(title);
-	author = TrimWhiteSpace(author);
-	price = TrimWhiteSpace(price);
-
-	// cast variables
-	iISBN = stoi(isbn);
-	dPrice = stod(price);
-
-	// Create book
-	book.setISBN(iISBN);
-	book.setAuthor(author);
-	book.setTitle(title);
-	book.setCost(dPrice);
 
 	return book;
 }
